@@ -90,6 +90,13 @@ cscope -cb
 ctags --fields=+i -n -L ./cscope.files
 cqmakedb -s ./cq.db -c ./cscope.out -t ./tags -p
 ```
+or
+```bash
+find . -iname "*.c" -o -iname "*.h" -o -iname "*.S" -o -iname "*.cpp" -o -iname "*.cc" -iname "*.hpp" > ./cscope.files
+cscope -cb
+ctags --fields=+i -n -L ./cscope.files
+cqmakedb -s ./cq.db -c ./cscope.out -t ./tags -p
+```
 
 In Windows, follow these steps for C/C++ source code:
 
@@ -108,6 +115,11 @@ dir /b/a/s *.hh  >> cscope.files
 cscope -cb
 ctags --fields=+i -n -L cscope.files
 cqmakedb -s cq.db -c cscope.out -t tags -p
+```
+
+Example:
+```bash
+cqsearch -s cq.db -p 1 -t <expression> -u
 ```
 
 Please replace the wildcard expressions above with *.java, *.py, *.rb, *.go and *.js respectively for Java, Python, Ruby, Go and Javascript. Details can be found on the [CodeQuery](https://github.com/ruben2020/codequery) page.

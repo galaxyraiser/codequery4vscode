@@ -111,8 +111,10 @@ export default class CQSearch {
         if (fp.length === 2) {
             var fullpath = fp[0];
             var lineno = fp[1];
-            var fn1 = fullpath.match(/([^\\\/]+)$/);
-            var fn = fn1? fn1[0] : "";
+            //var fn1 = fullpath.match(/([^\\\/]+)$/);
+            // cqsearch tool provides search reasults with $HOME prefix
+            var fn1 = fullpath.replace('$HOME', process.env.HOME);
+            var fn = fn1? fn1 : "";
             this.sra.addRecord(fn, fullpath, lineno, preview, stext);
         }
     }
@@ -129,8 +131,10 @@ export default class CQSearch {
             var stext = preview;
             var fullpath = fp[0];
             var lineno = fp[1];
-            var fn1 = fullpath.match(/([^\\\/]+)$/);
-            var fn = fn1? fn1[0] : "";
+            //var fn1 = fullpath.match(/([^\\\/]+)$/);
+            var fn1 = fullpath.replace('$HOME', process.env.HOME);
+            vscode.window.showInformationMessage('searchResultsTwoColumns:' + fn1);
+            var fn = fn1? fn1 : "";
             this.sra.addRecord(fn, fullpath, lineno, preview, stext);
         }
     }
