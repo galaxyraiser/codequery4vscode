@@ -29,7 +29,7 @@ export default class CQResultsProvider implements vscode.TreeDataProvider<SResul
 		var uriparts = uri.split("\t");
 		if (uriparts.length === 2) {
 			var fileuri = uriparts[0];
-			var linenum = uriparts[1];
+			var linenumStr = uriparts[1];
 			if (!fs.existsSync(fileuri)) {
 				var fn1 = fileuri.match(/([^\\\/]+)$/);
 				var fn = fn1 ? fn1[0] : fileuri;
@@ -38,34 +38,40 @@ export default class CQResultsProvider implements vscode.TreeDataProvider<SResul
 			}
 			vscode.workspace.openTextDocument(fileuri).then(doc => {
 				vscode.window.showTextDocument(doc).then(editor => {
-					var linenum1 = parseInt(linenum, 10);
-					var remaining = editor.document.lineCount - linenum1;
-					editor.revealRange(this.calcRange(linenum1, remaining));
+					var linenum = parseInt(linenumStr, 10);
+					var position = new vscode.Position(linenum - 1, linenum - 1);
+					// Line added - by having a selection at the same position twice, the cursor jumps there
+					editor.selections = [new vscode.Selection(position, position)];
+
+					// And the visible range jumps there too
+					var remaining = editor.document.lineCount - linenum;
+					editor.revealRange(this.calcRange(linenum, remaining, editor.document.lineCount - 1));
 				});
 			  });
 		}
 	}
 
-	private calcRange(linenum1: number, remaining: number): vscode.Range {
-		var p1 = linenum1;
-		var p2 = linenum1;
-		var d: number;
-		d = 5;
-		while (d >= 0) {
-			if (linenum1 > d) {
-				p1 = linenum1 - d;
-				break;
-			} else {d--;}
+	private calcRange(linenum1: number, remaining: number, total: number): vscode.Range {
+		var upperLine = linenum1 - 1;
+		var lowerLine = linenum1 - 1;
+
+		if (remaining >= 20) {
+			lowerLine += 20;
 		}
-		d = 3;
-		while (d >= 0) {
-			if (remaining >= d) {
-				p2 = linenum1 + d;
-				break;
-			} else {d--;}
+		else {
+			lowerLine = total;
 		}
-		var pos1 = new vscode.Position(p1, 0);
-		var pos2 = new vscode.Position(p2, 0);
+
+		if (linenum1 >= 10) {
+			upperLine -= 10;
+		}
+		else {
+			upperLine = 1;
+		}
+
+		//vscode.window.showInformationMessage('Line: ' + linenum1 + 'L: ' + lowerLine + 'U: ' + upperLine);
+		var pos1 = new vscode.Position(upperLine, 0);
+		var pos2 = new vscode.Position(lowerLine, 0);
 		var range = new vscode.Range(pos1, pos2);
 		return range;
 	}
